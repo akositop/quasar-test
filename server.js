@@ -1,12 +1,14 @@
 const express = require('express')
 const http = require('http')
-const socket = require('socket.io')
+const socketIO = require('socket.io')
 const cors = require('cors')
 const bodyParser = require('body-parser')
+/* routes */
 const routes = require('./routes/home/')
-
-var app = express(),
-  io = socket()
+const chatRoutes = require('./routes/chat/')
+const app = express()
+const httpApp = http.createServer(app)
+const io = socketIO(httpApp)
 
 // For parsing application/json
 app.use(express.json({ limit: '500mb' }))
@@ -22,11 +24,33 @@ app.use(bodyParser())
 
 // Add routes
 app.get('/', routes.index)
+app.use('/api/', chatRoutes)
+
+
 // Create and Listen Server Routes
-http.createServer(app)
-  .listen(app.get('port'), () => {
-      // console.log(`Now Listening on ${ app.get('port') }! Whew!`)
-      // io.on('connection', (socket) => {
-      //   console.log('a user connected');
-      // });
+httpApp.listen(app.get('port'), () => {
+    // Display open port
+    console.log(`Now Listening on Port ${ app.get('port') }! Whew!`)
+    // Connection open
+    io.on('connection', socket => {
+      console.log(`A User connected!`);
+
+      // Receiver from client message - Sending message
+      socket.on('chatMessage', msgs => {
+        console.log(`Message sent: ${ msgs }`)
+        // Emit event and return to client
+        io.emit('chatMessage', msgs)
+      })
+      // Receiver from client message - isTyping indicator
+      socket.on('is typing', data => {
+        // Emit event and return to client
+        io.emit('typing', data);
+       });
+
+      // Disconnect Users
+      socket.on('disconnect', () => {
+        console.log('A User disconnected');
+      });
+
+    });
   })

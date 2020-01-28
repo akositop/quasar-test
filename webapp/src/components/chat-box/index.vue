@@ -1,40 +1,44 @@
 <template>
     <div class="q-pa-md row justify-center">
       <div style="width: 100%; max-width: 400px">
+        <!-- Message sent from this device -->
         <q-chat-message
-          :text="['hey, how are you?']"
+          :text="sentText"
           sent
         />
+        <!-- Message receive from this device -->
         <q-chat-message
-          :text="['doing fine, how r you?']"
-        />
+          name="Jane"
+          avatar="https://cdn.quasar.dev/img/avatar5.jpg"
+          text-color="white"
+          bg-color="primary"
+        >
+          <q-spinner-dots size="2rem" />
+        </q-chat-message>
+        
         <q-input filled bottom-slots 
           v-model="text" 
-          :label="labelText" 
-          counter maxlength="12" 
+          :label="labelText"
+          @keypress="pressButton"
+          counter 
+          maxlength="50" 
           :dense="dense">
           <template v-slot:before>
             <q-avatar>
-              <img src="https://cdn.quasar.dev/img/avatar5.jpg">
+              <img src="https://cdn.stocksnap.io/img-thumbs/960w/M93Z01SJAF.jpg">
             </q-avatar>
-          </template>
-
-          <template v-slot:append>
-            <q-icon v-if="text !== ''" 
-              name="close" 
-              @click="text = ''" 
-              class="cursor-pointer" />
-            <q-icon name="schedule" />
           </template>
 
           <template v-slot:after>
             <q-btn round 
-              dense 
-              flat icon="send" />
+              dense
+              flat 
+              icon="send"
+              @click="sendMessage" />
           </template>
         </q-input>
       </div>
-  </div>
+  </div> 
 </template>
 
 <script src="./scripts/chat-box.js" />
