@@ -37,14 +37,19 @@ httpApp.listen(app.get('port'), () => {
 
       // Receiver from client message - Sending message
       socket.on('chatMessage', msgs => {
-        console.log(`Message sent: ${ msgs }`)
+        console.log(`Message sent: ${ msgs.message }`)
         // Emit event and return to client
-        io.emit('chatMessage', msgs)
+        socket.broadcast.emit('chatMessage', msgs)
       })
       // Receiver from client message - isTyping indicator
-      socket.on('is typing', data => {
+      socket.on('typing', data => {
         // Emit event and return to client
-        io.emit('typing', data);
+        socket.broadcast.emit('typing', data);
+       });
+
+       socket.on('stopTyping', data => {
+        // Emit event and return to client
+        socket.broadcast.emit('stopTyping', data);
        });
 
       // Disconnect Users
@@ -52,5 +57,9 @@ httpApp.listen(app.get('port'), () => {
         console.log('A User disconnected');
       });
 
+      // Create socket user
+      socket.on('created', data => {
+        socket.broadcast.emit('created', data)
+      })
     });
   })

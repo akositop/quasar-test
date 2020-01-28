@@ -2,8 +2,11 @@ import io from 'socket.io-client'
 export default {
   data() {
     return {
-      text: '',
-      sentText: [],
+      message: '',
+      messages: {
+        sender:  [], // Device 
+        receiver: [] // Other Device
+      },
       socket: null,
       isTyping: false,
       dense: false,
@@ -11,13 +14,10 @@ export default {
     }
   },
   mounted() {
-    // Emit Receiver from server (Web Sockets)
+    // Listen emit from server (Web Sockets)
+    // Sending to server and listen emit for receiver
     this.socket.on('chatMessage', msg => {
-      this.sentText.push(msg)
-    })
-
-    this.socket.on('typing', isTyping => {
-      this.isTyping = isTyping
+        this.messages.receiver.push(msg)
     })
   },
   created() {
@@ -25,29 +25,31 @@ export default {
     let url = `http://localhost:3000` // dev mode
 
     this.socket = io(url)
+
+    this.socket.emit('created', 'Patrick Nengasca')
+    this.socket.on('created', data => {
+      console.log(data)
+    })
+
+    this.socket.on('typing', () => {
+      this.isTyping = true
+    })
+
+    this.socket.on('stopTyping', () => {
+      this.isTyping = false
+    })
+  },
+  watch: {
+    message(value) {
+      value ? this.socket.emit('typing') : this.socket.emit('stopTyping')
+    }
   },
   methods: {
     sendMessage() {
-      // Sending to server
-      this.socket.emit('chatMessage', this.text)
-      this.text = ''
-    },
-    pressButton() {
-      // this.socket.broadcast.emit('typingMessage', {
-      //   sender: 
-      // })
-      clearTimeout()
-      setTimeout(() => {
-        if(this.text.length > 0) {
-          // this.isTyping = true
-          // this.socket.emit('is typing', this.isTyping)
-          console.log('true')
-        } else {
-          // this.isTyping = false
-          // this.socket.emit('is typing', this.isTyping)
-          console.log('false')
-        }
-      }, 1000)
+      // Sending to server and listen emit for this device / Sender
+      this.messages.sender.push(this.message)
+      this.socket.emit('chatMessage', this.message)
+      this.message = ''
     }
   }
 }

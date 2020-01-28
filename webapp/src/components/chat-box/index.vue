@@ -2,24 +2,30 @@
     <div class="q-pa-md row justify-center">
       <div style="width: 100%; max-width: 400px">
         <!-- Message sent from this device -->
-        <q-chat-message
-          :text="sentText"
-          sent
-        />
-        <!-- Message receive from this device -->
-        <q-chat-message
+        <div v-if="messages.sender.length > 0">
+          <q-chat-message
+            :text="messages.sender"
+            sent
+          />
+        </div>
+        <div v-if="messages.receiver.length > 0">
+          <q-chat-message
+            :text="messages.receiver"
+          />
+        </div>
+        <!-- Message receiver from this device -->
+        <!-- <q-chat-message
           name="Jane"
           avatar="https://cdn.quasar.dev/img/avatar5.jpg"
           text-color="white"
           bg-color="primary"
         >
           <q-spinner-dots size="2rem" />
-        </q-chat-message>
-        
+        </q-chat-message> -->
+        <small v-if="isTyping">User is Typing... </small>
         <q-input filled bottom-slots 
-          v-model="text" 
+          v-model="message" 
           :label="labelText"
-          @keypress="pressButton"
           counter 
           maxlength="50" 
           :dense="dense">
