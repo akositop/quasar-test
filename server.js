@@ -37,9 +37,9 @@ httpApp.listen(app.get('port'), () => {
 
       // Receiver from client message - Sending message
       socket.on('chatMessage', msgs => {
-        console.log(`Message sent: ${ msgs.message }`)
+        console.log(`Message sent: ${ msgs.message[0] }`)
         // Emit event and return to client
-        socket.broadcast.emit('chatMessage', msgs)
+        socket.broadcast.emit('chatMessage', msgs.message[0])
       })
       // Receiver from client message - isTyping indicator
       socket.on('typing', data => {

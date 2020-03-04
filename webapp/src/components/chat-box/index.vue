@@ -1,33 +1,51 @@
 <template>
     <div class="q-pa-md row justify-center">
       <div style="width: 100%; max-width: 400px">
-        <!-- Message sent from this device -->
-        <div v-if="messages.sender.length > 0">
+        <!-- Message sent from this device / Sender-->
+        <!-- <div v-if="messages.sender.length > 0">
           <q-chat-message
             :text="messages.sender"
+            text-sanitize
+            size="6"
             sent
           />
-        </div>
-        <div v-if="messages.receiver.length > 0">
+        </div> -->
+        <!-- Receiver -->
+        <!-- <div v-if="messages.receiver.length > 0">
           <q-chat-message
+            size="6"
             :text="messages.receiver"
+            text-sanitize
           />
+        </div> -->
+
+        <div v-if="messages.length > 0">
+          <div v-for="(convo, i) in sortedConvo" :key="i">
+            <div v-if="convo.isSender">
+              <q-chat-message
+                size="6"
+                :text="convo.message"
+                text-sanitize
+                sent />
+            </div>
+            <div v-else>
+              <q-chat-message
+                size="6"
+                :text="convo.message"
+                text-sanitize />
+            </div>
+          </div>
         </div>
-        <!-- Message receiver from this device -->
-        <!-- <q-chat-message
-          name="Jane"
-          avatar="https://cdn.quasar.dev/img/avatar5.jpg"
-          text-color="white"
-          bg-color="primary"
-        >
-          <q-spinner-dots size="2rem" />
-        </q-chat-message> -->
-        <small v-if="isTyping">User is Typing... </small>
+        <q-chat-message v-if="isTyping"
+            text-color="white"
+            bg-color="primary">
+            <q-spinner-dots size="2rem" />
+          </q-chat-message>
         <q-input filled bottom-slots 
           v-model="message" 
           :label="labelText"
           counter 
-          maxlength="50" 
+          maxlength="100" 
           :dense="dense">
           <template v-slot:before>
             <q-avatar>

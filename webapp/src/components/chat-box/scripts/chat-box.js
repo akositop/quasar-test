@@ -1,5 +1,7 @@
 import io from 'socket.io-client'
+import moment from 'moment'
 export default {
+  name: 'ChatBox',
   data() {
     return {
       message: '',
@@ -7,6 +9,7 @@ export default {
         sender:  [], // Device 
         receiver: [] // Other Device
       },
+      conversations: [],
       socket: null,
       isTyping: false,
       dense: false,
@@ -17,13 +20,18 @@ export default {
     // Listen emit from server (Web Sockets)
     // Sending to server and listen emit for receiver
     this.socket.on('chatMessage', msg => {
-        this.messages.receiver.push(msg)
+        this.conversations.push({
+          timestamp: moment().format('YYYY-MM-DD@HH:MM:ss'),
+          message: msg,
+          isSender: false
+        })
     })
   },
   created() {
     // let url = window.origin // prod mode
-    let url = `http://localhost:3000` // dev mode
-
+    // let url = `http://localhost:3000` // dev mode
+    let url = `http://10.10.11.124:3000`
+    
     this.socket = io(url)
 
     this.socket.emit('created', 'Patrick Nengasca')
@@ -44,11 +52,24 @@ export default {
       value ? this.socket.emit('typing') : this.socket.emit('stopTyping')
     }
   },
+  computed: {
+    sortedConvo() {
+      return this.conversations.sort((a,b) => b.timestamp - a.timestamp)
+    }
+  },
   methods: {
     sendMessage() {
       // Sending to server and listen emit for this device / Sender
-      this.messages.sender.push(this.message)
-      this.socket.emit('chatMessage', this.message)
+      this.conversations.push({
+        timestamp: moment().format('YYYY-MM-DD@HH:MM:ss'),
+        message: [this.message],
+        isSender: true
+      })
+      this.socket.emit('chatMessage', {
+        timestamp: moment().format('YYYY-MM-DD@HH:MM:ss'),
+        message: [this.message],
+        isSender: true
+      })
       this.message = ''
     }
   }
