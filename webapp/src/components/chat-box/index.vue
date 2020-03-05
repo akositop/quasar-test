@@ -19,8 +19,9 @@
           />
         </div> -->
 
-        <div v-if="messages.length > 0">
-          <div v-for="(convo, i) in sortedConvo" :key="i">
+        <div v-if="conversations.length > 0">
+          <div v-for="(convo, i) in conversations" 
+            :key="i">
             <div v-if="convo.isSender">
               <q-chat-message
                 size="6"

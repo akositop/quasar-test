@@ -22,7 +22,7 @@ export default {
     this.socket.on('chatMessage', msg => {
         this.conversations.push({
           timestamp: moment().format('YYYY-MM-DD@HH:MM:ss'),
-          message: msg,
+          message: [msg],
           isSender: false
         })
     })
@@ -50,11 +50,6 @@ export default {
   watch: {
     message(value) {
       value ? this.socket.emit('typing') : this.socket.emit('stopTyping')
-    }
-  },
-  computed: {
-    sortedConvo() {
-      return this.conversations.sort((a,b) => b.timestamp - a.timestamp)
     }
   },
   methods: {
